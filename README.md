@@ -1,0 +1,1 @@
+# maven-docker-push-extension
