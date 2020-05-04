@@ -6,7 +6,7 @@ import com.soebes.itf.jupiter.maven.MavenExecutionResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@MavenIT
+@MavenIT(goals = "deploy")
 public class DockerPushIT {
 
     @MavenTest
