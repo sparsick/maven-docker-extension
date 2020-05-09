@@ -14,11 +14,20 @@
                 <version>0.33.0</version>
                 <executions>
                     <execution>
-                        <id>docker.push</id>
                         <goals>
                             <goal>build</goal>
                             <goal>push</goal>
                         </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>user/demo</name>
+                                    <build>
+                                        <dockerFile>Dockerfile</dockerFile>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

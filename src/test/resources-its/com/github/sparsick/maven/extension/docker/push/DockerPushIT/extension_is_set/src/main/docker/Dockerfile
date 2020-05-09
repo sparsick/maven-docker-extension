@@ -1,3 +1,3 @@
 From ubuntu:20.04
 
-ENTRYPOINT["echo"]
+RUN echo "Hello World"

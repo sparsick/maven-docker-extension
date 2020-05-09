@@ -18,6 +18,16 @@
                             <goal>build</goal>
                             <goal>push</goal>
                         </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>user/demo</name>
+                                    <build>
+                                        <dockerFile>Dockerfile</dockerFile>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
