@@ -9,7 +9,10 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.stream.Collectors;
+
 import static com.soebes.itf.extension.assertj.MavenExecutionResultAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @MavenJupiterExtension
@@ -23,9 +26,12 @@ public class DockerPushIT {
 
 
     @MavenTest(goals = "deploy",
-                systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"})
+                systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"}) //TODO fix port is bad
     void no_extension_is_set(MavenExecutionResult result){
         assertThat(result).isSuccessful();
+
+        Assertions.assertThat(assertThat(result).log().info())
+            .doesNotContain("maven-docker-push-extension is active");
 
         Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
                 .asJson()
@@ -33,8 +39,17 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo");
     }
 
-    @MavenTest
+    @MavenTest(goals = "deploy",
+        systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"}) //TODO fix port is bad
     void extension_is_set(MavenExecutionResult result){
         assertThat(result).isSuccessful();
+
+        Assertions.assertThat(assertThat(result).log().info())
+            .contains("maven-docker-push-extension is active", "Find docker-maven-plugin");
+
+        Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+            .asJson()
+            .mapBody(node -> node.getObject().get("repositories"));
+        Assertions.assertThat(repositories).asString().contains("user/demo2");
     }
 }

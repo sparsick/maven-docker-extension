@@ -21,7 +21,7 @@
                         <configuration>
                             <images>
                                 <image>
-                                    <name>user/demo</name>
+                                    <name>user/demo2</name>
                                     <build>
                                         <dockerFile>Dockerfile</dockerFile>
                                     </build>

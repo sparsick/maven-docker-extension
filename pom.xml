@@ -15,27 +15,8 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <maven.version>3.1.0</maven.version>
-        <itf.version>0.6.0</itf.version>
+        <itf.version>0.7.0</itf.version>
     </properties>
-
-    <!-- Must be overwritten in every project. -->
-    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/sparsick/maven-docker-push-extension/issues</url>
-    </issueManagement>
-
-    <distributionManagement>
-        <site>
-            <id>github</id>
-            <url>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</url>
-        </site>
-    </distributionManagement>
-    <scm>
-        <developerConnection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</developerConnection>
-        <connection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</connection>
-        <url>https://github.com/sparsick/maven-docker-push-extension</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <dependencies>
         <dependency>
@@ -154,11 +135,23 @@
                     <execution>
                         <goals>
                             <goal>integration-test</goal>
-<!--                            <goal>verify</goal>-->
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/sparsick/maven-docker-push-extension/issues</url>
+    </issueManagement>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</developerConnection>
+        <connection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</connection>
+        <url>https://github.com/sparsick/maven-docker-push-extension</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>
