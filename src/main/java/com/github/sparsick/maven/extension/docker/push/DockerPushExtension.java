@@ -77,15 +77,16 @@ public class DockerPushExtension extends AbstractEventSpy {
     }
 
     private void sessionStarted(ExecutionEvent event) {
-        if(containsLifeCyclePluginGoals(event, "io.fabric8", "docker-maven-plugin", "push")) {
-            LOGGER.info("Find docker-maven-plugin");
-            System.out.println("Find docker-maven-plugin");
+        if (containsLifeCyclePluginGoals(event, "io.fabric8", "docker-maven-plugin", "push")) {
+            removePluginFromLifeCycle(event, "io.fabric8", "docker-maven-plugin", "push");
         }
 
     }
 
+
     private boolean containsLifeCyclePluginGoals(ExecutionEvent executionEvent, String groupId, String artifactId,
                                                  String goal) {
+        LOGGER.info("Find {}:{}:{}", groupId, artifactId, goal);
 
         boolean result = false;
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
@@ -104,5 +105,35 @@ public class DockerPushExtension extends AbstractEventSpy {
         }
         return result;
     }
+
+    private void removePluginFromLifeCycle(ExecutionEvent executionEvent, String groupId, String artifactId,
+                                           String goal) {
+
+        boolean removed = false;
+
+        List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
+        for (MavenProject mavenProject : sortedProjects) {
+            List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
+            for (Plugin plugin : buildPlugins) {
+                LOGGER.debug("Plugin: " + plugin.getId());
+                List<PluginExecution> printExecutions = plugin.getExecutions();
+                for (PluginExecution pluginExecution : printExecutions) {
+                    LOGGER.debug("  -> " + pluginExecution.getGoals());
+                }
+
+                if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
+                    if (!removed) {
+                        LOGGER.warn(groupId + ":" + artifactId + ":" + goal + " has been deactivated.");
+                    }
+                    List<PluginExecution> executions = plugin.getExecutions();
+                    for (PluginExecution pluginExecution : executions) {
+                        pluginExecution.removeGoal(goal);
+                        removed = true;
+                    }
+                }
+            }
+        }
+    }
+
 
 }

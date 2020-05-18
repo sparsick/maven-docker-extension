@@ -45,7 +45,8 @@ public class DockerPushIT {
         assertThat(result).isSuccessful();
 
         Assertions.assertThat(assertThat(result).log().info())
-            .contains("maven-docker-push-extension is active", "Find docker-maven-plugin");
+            .contains("maven-docker-push-extension is active",
+                    "Find io.fabric8:docker-maven-plugin:push");
 
         Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
             .asJson()
