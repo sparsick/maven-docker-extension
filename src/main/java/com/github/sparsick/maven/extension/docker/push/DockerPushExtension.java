@@ -5,18 +5,26 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.xml.Xpp3Dom;
+import org.apache.maven.shared.utils.xml.Xpp3DomBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named
 public class DockerPushExtension extends AbstractEventSpy {
 
     private final Logger LOGGER = LoggerFactory.getLogger(DockerPushExtension.class);
+    private Set<String> dockerImageNames = new HashSet<>();
 
     @Override
     public void init(Context context) throws Exception {
@@ -86,7 +94,6 @@ public class DockerPushExtension extends AbstractEventSpy {
 
     private boolean containsLifeCyclePluginGoals(ExecutionEvent executionEvent, String groupId, String artifactId,
                                                  String goal) {
-        LOGGER.info("Find {}:{}:{}", groupId, artifactId, goal);
 
         boolean result = false;
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
@@ -97,6 +104,7 @@ public class DockerPushExtension extends AbstractEventSpy {
                     List<PluginExecution> executions = plugin.getExecutions();
                     for (PluginExecution pluginExecution : executions) {
                         if (pluginExecution.getGoals().contains(goal)) {
+                            LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
                             result = true;
                         }
                     }
@@ -127,12 +135,22 @@ public class DockerPushExtension extends AbstractEventSpy {
                     }
                     List<PluginExecution> executions = plugin.getExecutions();
                     for (PluginExecution pluginExecution : executions) {
+                        parseDockerImageName(pluginExecution.getConfiguration());
                         pluginExecution.removeGoal(goal);
                         removed = true;
                     }
                 }
             }
         }
+    }
+
+    private void parseDockerImageName(Object configuration) {
+        LOGGER.debug("Configuration: {}", configuration);
+
+        // this is necessary because cast throw an exception "incompatible type"
+        Xpp3Dom dom = Xpp3DomBuilder.build(new StringReader(configuration.toString()));
+        dockerImageNames.addAll(Arrays.stream(dom.getChild("images").getChildren("image")).map(image -> image.getChild("name").getValue()).collect(Collectors.toSet()));
+        LOGGER.info("Found docker image names: {}", dockerImageNames);
     }
 
 
