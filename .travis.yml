@@ -1,7 +1,7 @@
 language: java
 jdk:
   - openjdk11
-script:mvn -B verify
+script: mvn -B verify
 notifications:
   email:
     on_success: always
