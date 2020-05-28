@@ -26,6 +26,8 @@ public class DockerPushExtension extends AbstractEventSpy {
     private final Logger LOGGER = LoggerFactory.getLogger(DockerPushExtension.class);
     private Set<String> dockerImageNames = new HashSet<>();
 
+    private DockerClient dockerClient;
+
     @Override
     public void init(Context context) throws Exception {
         super.init(context);
@@ -54,8 +56,8 @@ public class DockerPushExtension extends AbstractEventSpy {
 //                    }
 //                    else
 //                    {
-//                        sessionEnded( executionEvent );
 //                    }
+                        sessionEnded( event );
                 break;
             case ForkFailed:
             case ForkedProjectFailed:
@@ -82,6 +84,18 @@ public class DockerPushExtension extends AbstractEventSpy {
                 LOGGER.error("handleExecutionEvent: {}", eventType);
                 break;
         }
+    }
+
+    private void sessionEnded(ExecutionEvent event) {
+        if (goalsContain(event, "deploy")) {
+            LOGGER.info("Starting pushing docker images...");
+            dockerClient = new DockerClient(System.getProperty("docker.push.registry"));
+            dockerImageNames.forEach( image -> dockerClient.pushDockerImage(image));
+        }
+    }
+
+    private boolean goalsContain( ExecutionEvent event, String goal ) {
+        return event.getSession().getGoals().contains( goal );
     }
 
     private void sessionStarted(ExecutionEvent event) {

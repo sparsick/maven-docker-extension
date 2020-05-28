@@ -46,7 +46,8 @@ public class DockerPushIT {
 
         Assertions.assertThat(assertThat(result).log().info())
             .contains("maven-docker-push-extension is active",
-                    "Found io.fabric8:docker-maven-plugin:push")
+                    "Found io.fabric8:docker-maven-plugin:push",
+                    "Starting pushing docker images...")
             .doesNotContain("docker-maven-plugin:0.33.0:push (default) @ docker-push-no-extension");
 
         Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
@@ -58,4 +59,5 @@ public class DockerPushIT {
 
     // todo configuration not in execution
     // todo extension is set but no docker plugin exits
+    // todo failure during pushing in extension
 }
