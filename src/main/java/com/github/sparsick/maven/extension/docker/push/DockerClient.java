@@ -29,7 +29,11 @@ public class DockerClient implements Closeable {
 
     public void pushDockerImage(String imageName) {
         try {
-            dockerClient.pushImageCmd(registryAddress + "/" + imageName)
+            String remoteImageName = registryAddress + "/" + imageName;
+            //TODO tagname latest replace by better logic
+            dockerClient.tagImageCmd(imageName,remoteImageName, "latest" )
+                    .exec();
+            dockerClient.pushImageCmd(remoteImageName)
                     .withAuthConfig(new AuthConfig().withRegistryAddress(registryAddress))
                     .start()
                     .awaitCompletion();

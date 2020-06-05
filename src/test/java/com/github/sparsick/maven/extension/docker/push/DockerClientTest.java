@@ -1,11 +1,21 @@
 package com.github.sparsick.maven.extension.docker.push;
 
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory;
 import kong.unirest.Unirest;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.io.File;
+import java.util.Collections;
 
 @Testcontainers
 class DockerClientTest {
@@ -13,6 +23,29 @@ class DockerClientTest {
     @Container //TODO remove fix port
     private FixedHostPortGenericContainer registry = new FixedHostPortGenericContainer("registry:2")
             .withFixedExposedPort(5001, 5000);
+    private com.github.dockerjava.api.DockerClient dockerClient;
+
+
+    @BeforeEach
+    void setup() throws InterruptedException {
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .build();
+        // when using docker-java directly
+//        dockerClient = DockerClientBuilder.getInstance(config).build();
+
+        // workaround because elder docker-java lib is shaded in testcontainers
+        dockerClient = DockerClientImpl.getInstance(config).withDockerCmdExecFactory(new OkHttpDockerCmdExecFactory());
+        dockerClient
+                .buildImageCmd(new File("src/test/resources/Dockerfile"))
+                .withTags(Collections.singleton("user/demo2"))
+                .start()
+                .awaitCompletion();
+    }
+
+    @AfterEach
+    void tearDown(){
+        dockerClient.removeImageCmd("user/demo2");
+    }
 
     @Test
     void pushDockerImage() {
