@@ -111,11 +111,13 @@ public class DockerPushExtension extends AbstractEventSpy {
     private boolean containsLifeCyclePluginGoals(ExecutionEvent executionEvent, String groupId, String artifactId,
                                                  String goal) {
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
+
         boolean foundgivenPluginGoal = sortedProjects.stream()
                 .flatMap(mavenProject -> mavenProject.getBuildPlugins().stream())
                 .filter(plugin -> groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId()))
                 .flatMap(plugin -> plugin.getExecutions().stream())
                 .anyMatch(pluginExecution -> pluginExecution.getGoals().contains(goal));
+
         if(foundgivenPluginGoal) {
             LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
         }
@@ -125,30 +127,24 @@ public class DockerPushExtension extends AbstractEventSpy {
     private void removePluginFromLifeCycle(ExecutionEvent executionEvent, String groupId, String artifactId,
                                            String goal) {
 
-        boolean removed = false;
-
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
-        for (MavenProject mavenProject : sortedProjects) {
-            List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
-            for (Plugin plugin : buildPlugins) {
-                LOGGER.debug("Plugin: " + plugin.getId());
-                List<PluginExecution> printExecutions = plugin.getExecutions();
-                for (PluginExecution pluginExecution : printExecutions) {
-                    LOGGER.debug("  -> " + pluginExecution.getGoals());
-                }
 
-                if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
-                    if (!removed) {
-                        LOGGER.warn(groupId + ":" + artifactId + ":" + goal + " has been deactivated.");
-                    }
-                    List<PluginExecution> executions = plugin.getExecutions();
-                    for (PluginExecution pluginExecution : executions) {
-                        parseDockerImageName(pluginExecution.getConfiguration());
-                        pluginExecution.removeGoal(goal);
-                        removed = true;
-                    }
-                }
-            }
+        List<PluginExecution> foundPluginExecution = sortedProjects.stream()
+                .flatMap(mavenProject -> mavenProject.getBuildPlugins().stream())
+                .filter(plugin -> {
+                    LOGGER.debug("Plugin: " + plugin.getId());
+                    plugin.getExecutions().forEach(pluginExecution -> LOGGER.debug("  -> " + pluginExecution.getGoals()));
+                    return groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId());
+                })
+                .flatMap(plugin -> plugin.getExecutions().stream())
+                .collect(Collectors.toList());
+
+        if(!foundPluginExecution.isEmpty()){
+            LOGGER.warn(groupId + ":" + artifactId + ":" + goal + " has been deactivated.");
+            foundPluginExecution.forEach(pluginExecution -> {
+                parseDockerImageName(pluginExecution.getConfiguration());
+                pluginExecution.removeGoal(goal);
+            });
         }
     }
 
