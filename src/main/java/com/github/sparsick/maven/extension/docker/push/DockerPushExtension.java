@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 @Named
@@ -108,24 +110,16 @@ public class DockerPushExtension extends AbstractEventSpy {
 
     private boolean containsLifeCyclePluginGoals(ExecutionEvent executionEvent, String groupId, String artifactId,
                                                  String goal) {
-
-        boolean result = false;
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
-        for (MavenProject mavenProject : sortedProjects) {
-            List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
-            for (Plugin plugin : buildPlugins) {
-                if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
-                    List<PluginExecution> executions = plugin.getExecutions();
-                    for (PluginExecution pluginExecution : executions) {
-                        if (pluginExecution.getGoals().contains(goal)) {
-                            LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
-                            result = true;
-                        }
-                    }
-                }
-            }
+        boolean foundgivenPluginGoal = sortedProjects.stream()
+                .flatMap(mavenProject -> mavenProject.getBuildPlugins().stream())
+                .filter(plugin -> groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId()))
+                .flatMap(plugin -> plugin.getExecutions().stream())
+                .anyMatch(pluginExecution -> pluginExecution.getGoals().contains(goal));
+        if(foundgivenPluginGoal) {
+            LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
         }
-        return result;
+        return foundgivenPluginGoal;
     }
 
     private void removePluginFromLifeCycle(ExecutionEvent executionEvent, String groupId, String artifactId,
