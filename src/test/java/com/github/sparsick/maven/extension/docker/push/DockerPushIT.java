@@ -56,8 +56,24 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo2");
     }
 
+    @MavenTest(goals = "deploy",
+            systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"}) //TODO fix port is bad
+    void docker_plugin_configuration_outside_execution(MavenExecutionResult result){
+        assertThat(result).isSuccessful();
 
-    // todo configuration not in execution
+        Assertions.assertThat(assertThat(result).log().info())
+                .contains("maven-docker-push-extension is active",
+                        "Found io.fabric8:docker-maven-plugin:push",
+                        "Starting pushing docker images...")
+                .doesNotContain("docker-maven-plugin:0.33.0:push (default) @ docker-push-no-extension");
+
+        Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+                .asJson()
+                .mapBody(node -> node.getObject().get("repositories"));
+        Assertions.assertThat(repositories).asString().contains("user/demo2");
+    }
+
+
     // todo extension is set but no docker plugin exits
     // todo failure during pushing in extension
 }
