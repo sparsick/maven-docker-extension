@@ -9,10 +9,7 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.stream.Collectors;
-
 import static com.soebes.itf.extension.assertj.MavenExecutionResultAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @MavenJupiterExtension
@@ -73,7 +70,23 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo2");
     }
 
+    @MavenTest(goals = "deploy",
+            systemProperties = {"maven.deploy.skip"}) //TODO fix port is bad
+    void extension_is_set_but_no_docker_plugin(MavenExecutionResult result){
+        assertThat(result).isSuccessful();
 
-    // todo extension is set but no docker plugin exits
+        Assertions.assertThat(assertThat(result).log().info())
+                .contains("maven-docker-push-extension is active")
+                .doesNotContain("Found io.fabric8:docker-maven-plugin:push",
+                                "Starting pushing docker images...");
+
+        Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+                .asJson()
+                .mapBody(node -> node.getObject().get("repositories"));
+        Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
+    }
+
+
+
     // todo failure during pushing in extension
 }

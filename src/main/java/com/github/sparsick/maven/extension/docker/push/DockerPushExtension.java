@@ -87,7 +87,7 @@ public class DockerPushExtension extends AbstractEventSpy {
     }
 
     private void sessionEnded(ExecutionEvent event) {
-        if (goalsContain(event, "deploy")) {
+        if (goalsContain(event, "deploy") && !dockerImageNames.isEmpty()) {
             LOGGER.info("Starting pushing docker images...");
             dockerClient = new DockerClient(System.getProperty("docker.push.registry"));
             dockerImageNames.forEach( image -> dockerClient.pushDockerImage(image));
