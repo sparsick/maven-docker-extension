@@ -41,6 +41,7 @@ public class DockerPushIT {
     void extension_is_set(MavenExecutionResult result){
         assertThat(result).isSuccessful();
 
+        // io.fabric8:docker-maven-plugin:push has been deactivated.
         Assertions.assertThat(assertThat(result).log().info())
             .contains("maven-docker-push-extension is active",
                     "Found io.fabric8:docker-maven-plugin:push",
@@ -58,6 +59,7 @@ public class DockerPushIT {
     void docker_plugin_configuration_outside_execution(MavenExecutionResult result){
         assertThat(result).isSuccessful();
 
+        //  io.fabric8:docker-maven-plugin:push has been deactivated.
         Assertions.assertThat(assertThat(result).log().info())
                 .contains("maven-docker-push-extension is active",
                         "Found io.fabric8:docker-maven-plugin:push",
@@ -80,6 +82,8 @@ public class DockerPushIT {
                 .doesNotContain("Found io.fabric8:docker-maven-plugin:push",
                                 "Starting pushing docker images...");
 
+        // io.fabric8:docker-maven-plugin:push has been deactivated. doesnotcontain
+
         Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
@@ -90,9 +94,27 @@ public class DockerPushIT {
     void extension_is_set_docker_plugin_exists_but_no_deploy_goal(MavenExecutionResult result){
         assertThat(result).isSuccessful();
 
+//        " io.fabric8:docker-maven-plugin:push has been deactivated."
         Assertions.assertThat(assertThat(result).log().info())
                 .contains("maven-docker-push-extension is active",
                         "Found io.fabric8:docker-maven-plugin:push")
+                .doesNotContain("Starting pushing docker images...");
+
+        Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+                .asJson()
+                .mapBody(node -> node.getObject().get("repositories"));
+        Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
+    }
+
+    @MavenTest(goals = "deploy",
+            systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"}) //TODO fix port is bad
+    void extension_is_set_but_build_failed(MavenExecutionResult result){
+        assertThat(result).isFailure();
+
+        Assertions.assertThat(assertThat(result).log().info())
+                .contains("maven-docker-push-extension is active",
+                        "Found io.fabric8:docker-maven-plugin:push")
+//                        "The Maven Docker Push Extension will not be called based on previous errors.")
                 .doesNotContain("Starting pushing docker images...");
 
         Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")

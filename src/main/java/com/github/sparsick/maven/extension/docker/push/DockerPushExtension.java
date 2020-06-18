@@ -27,7 +27,7 @@ public class DockerPushExtension extends AbstractEventSpy {
 
     private final Logger LOGGER = LoggerFactory.getLogger(DockerPushExtension.class);
     private Set<String> dockerImageNames = new HashSet<>();
-
+    private boolean projectFailed = false;
     private DockerClient dockerClient;
 
     @Override
@@ -52,24 +52,19 @@ public class DockerPushExtension extends AbstractEventSpy {
                 sessionStarted(event);
                 break;
             case SessionEnded:
-//                    if ( this.failure )
-//                    {
-//                        LOGGER.warn( "The Maven Deployer Extension will not be called based on previous errors." );
-//                    }
-//                    else
-//                    {
-//                    }
-                        sessionEnded( event );
+                if (this.projectFailed) {
+                        LOGGER.warn( "The Maven Docker Push Extension will not be called based on previous errors." );
+                } else {
+                    sessionEnded( event );
+
+                }
                 break;
             case ForkFailed:
             case ForkedProjectFailed:
             case MojoFailed:
             case ProjectFailed:
-                // TODO: Can we find out more about the cause of failure?
-//                    LOGGER.debug( "Some failure has occured." );
-//                    this.failure = true;
+                this.projectFailed = true;
                 break;
-
             case ForkStarted:
             case ForkSucceeded:
             case ForkedProjectStarted:
