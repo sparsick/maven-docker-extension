@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 @Named
@@ -25,7 +27,7 @@ public class DockerPushExtension extends AbstractEventSpy {
 
     private final Logger LOGGER = LoggerFactory.getLogger(DockerPushExtension.class);
     private Set<String> dockerImageNames = new HashSet<>();
-
+    private boolean projectFailed = false;
     private DockerClient dockerClient;
 
     @Override
@@ -50,24 +52,19 @@ public class DockerPushExtension extends AbstractEventSpy {
                 sessionStarted(event);
                 break;
             case SessionEnded:
-//                    if ( this.failure )
-//                    {
-//                        LOGGER.warn( "The Maven Deployer Extension will not be called based on previous errors." );
-//                    }
-//                    else
-//                    {
-//                    }
-                        sessionEnded( event );
+                if (this.projectFailed) {
+                        LOGGER.warn( "The Maven Docker Push Extension will not be called based on previous errors." );
+                } else {
+                    sessionEnded( event );
+
+                }
                 break;
             case ForkFailed:
             case ForkedProjectFailed:
             case MojoFailed:
             case ProjectFailed:
-                // TODO: Can we find out more about the cause of failure?
-//                    LOGGER.debug( "Some failure has occured." );
-//                    this.failure = true;
+                this.projectFailed = true;
                 break;
-
             case ForkStarted:
             case ForkSucceeded:
             case ForkedProjectStarted:
@@ -87,7 +84,7 @@ public class DockerPushExtension extends AbstractEventSpy {
     }
 
     private void sessionEnded(ExecutionEvent event) {
-        if (goalsContain(event, "deploy")) {
+        if (goalsContain(event, "deploy") && !dockerImageNames.isEmpty()) {
             LOGGER.info("Starting pushing docker images...");
             dockerClient = new DockerClient(System.getProperty("docker.push.registry"));
             dockerImageNames.forEach( image -> dockerClient.pushDockerImage(image));
@@ -108,53 +105,41 @@ public class DockerPushExtension extends AbstractEventSpy {
 
     private boolean containsLifeCyclePluginGoals(ExecutionEvent executionEvent, String groupId, String artifactId,
                                                  String goal) {
-
-        boolean result = false;
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
-        for (MavenProject mavenProject : sortedProjects) {
-            List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
-            for (Plugin plugin : buildPlugins) {
-                if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
-                    List<PluginExecution> executions = plugin.getExecutions();
-                    for (PluginExecution pluginExecution : executions) {
-                        if (pluginExecution.getGoals().contains(goal)) {
-                            LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
-                            result = true;
-                        }
-                    }
-                }
-            }
+
+        boolean foundgivenPluginGoal = sortedProjects.stream()
+                .flatMap(mavenProject -> mavenProject.getBuildPlugins().stream())
+                .filter(plugin -> groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId()))
+                .flatMap(plugin -> plugin.getExecutions().stream())
+                .anyMatch(pluginExecution -> pluginExecution.getGoals().contains(goal));
+
+        if(foundgivenPluginGoal) {
+            LOGGER.info("Found {}:{}:{}", groupId, artifactId, goal);
         }
-        return result;
+        return foundgivenPluginGoal;
     }
 
     private void removePluginFromLifeCycle(ExecutionEvent executionEvent, String groupId, String artifactId,
                                            String goal) {
 
-        boolean removed = false;
-
         List<MavenProject> sortedProjects = executionEvent.getSession().getProjectDependencyGraph().getSortedProjects();
-        for (MavenProject mavenProject : sortedProjects) {
-            List<Plugin> buildPlugins = mavenProject.getBuildPlugins();
-            for (Plugin plugin : buildPlugins) {
-                LOGGER.debug("Plugin: " + plugin.getId());
-                List<PluginExecution> printExecutions = plugin.getExecutions();
-                for (PluginExecution pluginExecution : printExecutions) {
-                    LOGGER.debug("  -> " + pluginExecution.getGoals());
-                }
 
-                if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
-                    if (!removed) {
-                        LOGGER.warn(groupId + ":" + artifactId + ":" + goal + " has been deactivated.");
-                    }
-                    List<PluginExecution> executions = plugin.getExecutions();
-                    for (PluginExecution pluginExecution : executions) {
-                        parseDockerImageName(pluginExecution.getConfiguration());
-                        pluginExecution.removeGoal(goal);
-                        removed = true;
-                    }
-                }
-            }
+        List<PluginExecution> foundPluginExecution = sortedProjects.stream()
+                .flatMap(mavenProject -> mavenProject.getBuildPlugins().stream())
+                .filter(plugin -> {
+                    LOGGER.debug("Plugin: " + plugin.getId());
+                    plugin.getExecutions().forEach(pluginExecution -> LOGGER.debug("  -> " + pluginExecution.getGoals()));
+                    return groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId());
+                })
+                .flatMap(plugin -> plugin.getExecutions().stream())
+                .collect(Collectors.toList());
+
+        if(!foundPluginExecution.isEmpty()){
+            LOGGER.warn(groupId + ":" + artifactId + ":" + goal + " has been deactivated.");
+            foundPluginExecution.forEach(pluginExecution -> {
+                parseDockerImageName(pluginExecution.getConfiguration());
+                pluginExecution.removeGoal(goal);
+            });
         }
     }
 
