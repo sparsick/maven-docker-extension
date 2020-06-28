@@ -1,4 +1,4 @@
-package com.github.sparsick.maven.extension.docker.push;
+package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;

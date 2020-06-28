@@ -1,8 +1,7 @@
-package com.github.sparsick.maven.extension.docker.push;
+package com.github.sparsick.maven.docker.extension;
 
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.xml.Xpp3Dom;
@@ -17,9 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 @Named

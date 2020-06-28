@@ -1,4 +1,4 @@
-package com.github.sparsick.maven.extension.docker.push;
+package com.github.sparsick.maven.docker.extension;
 
 import com.soebes.itf.jupiter.extension.MavenJupiterExtension;
 import com.soebes.itf.jupiter.extension.MavenTest;

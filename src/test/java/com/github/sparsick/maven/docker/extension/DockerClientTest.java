@@ -1,4 +1,4 @@
-package com.github.sparsick.maven.extension.docker.push;
+package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -7,7 +7,6 @@ import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory;
 import kong.unirest.Unirest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.FixedHostPortGenericContainer;

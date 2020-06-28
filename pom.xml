@@ -2,13 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.sparsick.maven.extension</groupId>
-    <artifactId>maven-docker-push-extension</artifactId>
+    <groupId>com.github.sparsick.maven.docker.extension</groupId>
+    <artifactId>maven-docker-extension</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>The Maven Docker Push Extension.</name>
-    <description>Push Docker image into a registry at the end of the Maven session which
-        solved deployAtEnd configuration.</description>
+    <name>The Maven Docker Extension.</name>
+    <description>Push Docker image into a registry at the end of the Maven session. It simulates a deployAtEnd for Docker Images.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -155,13 +154,13 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/sparsick/maven-docker-push-extension/issues</url>
+        <url>https://github.com/sparsick/maven-docker-extension/issues</url>
     </issueManagement>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</developerConnection>
-        <connection>scm:git:git@github.com:sparsick/maven-docker-push-extension.git</connection>
-        <url>https://github.com/sparsick/maven-docker-push-extension</url>
+        <developerConnection>scm:git:git@github.com:sparsick/maven-docker-extension.git</developerConnection>
+        <connection>scm:git:git@github.com:sparsick/maven-docker-extension.git</connection>
+        <url>https://github.com/sparsick/maven-docker-extension</url>
         <tag>HEAD</tag>
     </scm>
 </project>
