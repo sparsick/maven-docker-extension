@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.sparsick.maven.extension</groupId>
+        <artifactId>maven-docker-push-with-extension-multi-module</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.github.sparsick.maven.extension</groupId>
+    <artifactId>maven-docker-push-with-extension-multi-module-a</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.33.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>user/demo1</name>
+                                    <build>
+                                        <dockerFile>Dockerfile</dockerFile>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

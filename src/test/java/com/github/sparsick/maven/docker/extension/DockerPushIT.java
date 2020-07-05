@@ -140,6 +140,25 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
     }
 
+    @MavenTest(goals = "deploy",
+            systemProperties = {"docker.push.registry=localhost:5001", "maven.deploy.skip"})
+        //TODO fix port is bad
+    void extension_is_set_multi_module(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+            assertThat(result).isSuccessful();
+
+            Assertions.assertThat(assertThat(result).log().info())
+                    .contains("maven-docker-push-extension is active",
+                            "Found io.fabric8:docker-maven-plugin:push",
+                            "Starting pushing docker images...");
+            Assertions.assertThat(warnMavenLog(mavenLog))
+                    .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
+
+            Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+                    .asJson()
+                    .mapBody(node -> node.getObject().get("repositories"));
+            Assertions.assertThat(repositories).asString().contains("user/demo1",  "user/demo2");
+    }
+
     private List<String> warnMavenLog(MavenLog mavenLog) throws IOException {
         return Files.readAllLines(mavenLog.getStdout())
                 .stream()
