@@ -4,7 +4,7 @@
 
     <groupId>com.github.sparsick.maven.docker.extension</groupId>
     <artifactId>maven-docker-extension</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>The Maven Docker Extension.</name>
     <description>Push Docker image into a registry at the end of the Maven session. It simulates a deployAtEnd for Docker Images.</description>
