@@ -5,7 +5,7 @@
 This Maven extension is a PoC for an [issue #1266](https://github.com/fabric8io/docker-maven-plugin/issues/1266) of [docker-maven-plugin](https://github.com/fabric8io/docker-maven-plugin). 
 The concept of this extension is based on [Maven Deployer Extension](https://github.com/khmarbaise/maven-deployer-extension).
 It checks if Docker Maven Plugin's goal push is configured in the project. 
-If it is so, then this goal is deactivated and all Docker images, that are configured in Docker Maven Plugin, are pushed via this extension.
+If it is so, then this goal is deactivated and all Docker images, that are configured in Docker Maven Plugin, are pushed via this extension after a Maven build runs successfully.
 
 ## Usage
 
