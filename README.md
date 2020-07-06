@@ -17,7 +17,7 @@ If you want to use this extension, you need Maven 3.3.1+ and you have to define 
   <extension>
    <groupId>com.github.sparsick.maven.docker.extension</groupId>
    <artifactId>maven-docker-extension</artifactId>
-   <version>0.0.1-SNAPSHOT</version>
+   <version>0.0.1</version>
   </extension>
 </extensions>
 ```
