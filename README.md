@@ -1,5 +1,5 @@
 # A Maven Extension for Docker Maven Plugin
-[![Build Status](https://travis-ci.org/sparsick/maven-docker-push-extension.svg?branch=master)](https://travis-ci.org/sparsick/maven-docker-push-extension)
+[![Build Status](https://travis-ci.org/sparsick/maven-docker-extension.svg?branch=master)](https://travis-ci.org/sparsick/maven-docker-push-extension)
 
 ## Overview
 This Maven extension is a PoC for an [issue #1266](https://github.com/fabric8io/docker-maven-plugin/issues/1266) of [docker-maven-plugin](https://github.com/fabric8io/docker-maven-plugin). 
