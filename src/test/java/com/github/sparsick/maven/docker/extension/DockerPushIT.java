@@ -1,19 +1,15 @@
 package com.github.sparsick.maven.docker.extension;
 
+import com.soebes.itf.jupiter.extension.MavenGoal;
 import com.soebes.itf.jupiter.extension.MavenJupiterExtension;
 import com.soebes.itf.jupiter.extension.MavenTest;
+import com.soebes.itf.jupiter.extension.SystemProperty;
 import com.soebes.itf.jupiter.maven.MavenExecutionResult;
-import com.soebes.itf.jupiter.maven.MavenLog;
 import kong.unirest.Unirest;
 import org.assertj.core.api.Assertions;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.soebes.itf.extension.assertj.MavenExecutionResultAssert.assertThat;
 
@@ -28,10 +24,11 @@ public class DockerPushIT {
 //            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*listening on [::]:6000.*"))
 
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"docker.push.registry=localhost:6000", "maven.deploy.skip"})
-        //TODO fix port is bad
-    void no_extension_is_set(MavenExecutionResult result) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void no_extension_is_set(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
         assertThat(result)
@@ -45,10 +42,11 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo");
     }
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"docker.push.registry=localhost:6000", "maven.deploy.skip"})
-        //TODO fix port is bad
-    void extension_is_set(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void extension_is_set(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
         assertThat(result)
@@ -69,10 +67,11 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo2");
     }
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"docker.push.registry=localhost:6000", "maven.deploy.skip"})
-        //TODO fix port is bad
-    void docker_plugin_configuration_outside_execution(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void docker_plugin_configuration_outside_execution(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
         assertThat(result)
@@ -93,10 +92,11 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().contains("user/demo2");
     }
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"maven.deploy.skip"})
-        //TODO fix port is bad
-    void extension_is_set_but_no_docker_plugin(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void extension_is_set_but_no_docker_plugin(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
         assertThat(result)
@@ -116,9 +116,9 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
     }
 
-    @MavenTest(goals = "install")
-        //TODO fix port is bad
-    void extension_is_set_docker_plugin_exists_but_no_deploy_goal(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("install")
+    void extension_is_set_docker_plugin_exists_but_no_deploy_goal(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
         assertThat(result)
@@ -138,10 +138,11 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
     }
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"docker.push.registry=localhost:6000", "maven.deploy.skip"})
-        //TODO fix port is bad
-    void extension_is_set_but_build_failed(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void extension_is_set_but_build_failed(MavenExecutionResult result) {
         assertThat(result).isFailure();
 
         assertThat(result)
@@ -161,10 +162,11 @@ public class DockerPushIT {
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
     }
 
-    @MavenTest(goals = "deploy",
-            systemProperties = {"docker.push.registry=localhost:6000", "maven.deploy.skip"})
-        //TODO fix port is bad
-    void extension_is_set_multi_module(MavenExecutionResult result, MavenLog mavenLog) throws IOException {
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
+    void extension_is_set_multi_module(MavenExecutionResult result) {
             assertThat(result).isSuccessful();
 
             assertThat(result)
