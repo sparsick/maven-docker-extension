@@ -18,6 +18,7 @@ public class DockerClient implements Closeable {
 
     public DockerClient(String registryAddress) {
         this.registryAddress = registryAddress;
+        //Hier können wir ein wenig weiter machen.
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .build();
         // when using docker-java directly
