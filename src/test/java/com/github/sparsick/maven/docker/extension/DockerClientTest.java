@@ -21,7 +21,7 @@ class DockerClientTest {
 
     @Container //TODO remove fix port
     private FixedHostPortGenericContainer registry = new FixedHostPortGenericContainer("registry:2")
-            .withFixedExposedPort(5001, 5000);
+            .withFixedExposedPort(6000, 5000);
     private com.github.dockerjava.api.DockerClient dockerClient;
 
 
@@ -48,10 +48,10 @@ class DockerClientTest {
 
     @Test
     void pushDockerImage() {
-        DockerClient clientUnderTest = new DockerClient("localhost:5001");
+        DockerClient clientUnderTest = new DockerClient("localhost:6000");
         clientUnderTest.pushDockerImage("user/demo2");
 
-        Object repositories = Unirest.get("http://localhost:5001/v2/_catalog")
+        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().contains("user/demo2");
