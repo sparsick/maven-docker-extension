@@ -1,9 +1,8 @@
 package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory;
 import kong.unirest.Unirest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -29,11 +28,8 @@ class DockerClientTest {
     void setup() throws InterruptedException {
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .build();
-        // when using docker-java directly
-//        dockerClient = DockerClientBuilder.getInstance(config).build();
+        dockerClient = DockerClientBuilder.getInstance(config).build();
 
-        // workaround because elder docker-java lib is shaded in testcontainers
-        dockerClient = DockerClientImpl.getInstance(config).withDockerCmdExecFactory(new OkHttpDockerCmdExecFactory());
         dockerClient
                 .buildImageCmd(new File("src/test/resources/Dockerfile"))
                 .withTags(Collections.singleton("user/demo2"))
