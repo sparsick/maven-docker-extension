@@ -2,9 +2,8 @@ package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,10 +21,7 @@ public class DockerClient implements Closeable {
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .build();
         // when using docker-java directly
-//        dockerClient = DockerClientBuilder.getInstance(config).build();
-
-        // workaround because elder docker-java lib is shaded in testcontainers
-        dockerClient = DockerClientImpl.getInstance(config).withDockerCmdExecFactory(new OkHttpDockerCmdExecFactory());
+        dockerClient = DockerClientBuilder.getInstance(config).build();
     }
 
     public void pushDockerImage(String imageName) {
