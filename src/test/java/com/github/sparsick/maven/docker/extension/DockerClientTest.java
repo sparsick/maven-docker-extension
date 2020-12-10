@@ -47,7 +47,7 @@ class DockerClientTest {
         DockerClient clientUnderTest = new DockerClient("localhost:6000");
         clientUnderTest.pushDockerImage("user/demo2");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get("http://" + registry.getHost() + ":6000/v2/_catalog")
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().contains("user/demo2");

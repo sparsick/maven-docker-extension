@@ -10,9 +10,12 @@ on:
 
 jobs:
   openjdk:
-    name: "OpenJDK 11"
+    strategy:
+      matrix:
+        jdk: [ jdk-8-slim, jdk-11-slim ]
+    name: "OpenJDK ${{ matrix.jdk }}"
     runs-on: ubuntu-latest
-    container: "maven:3.6.3-jdk-11-slim"
+    container: "maven:3.6.3-${{ matrix.jdk }}"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
