@@ -23,6 +23,7 @@ public class DockerPushIT {
             .withFixedExposedPort(6000, 5000);
 //            .waitingFor(new LogMessageWaitStrategy().withRegEx(".*listening on [::]:6000.*"))
 
+    private final String REGISTRY_URL = "http://" + registry.getHost() + ":6000/v2/_catalog";
 
     @MavenTest
     @MavenGoal("deploy")
@@ -36,7 +37,7 @@ public class DockerPushIT {
                 .info()
                 .doesNotContain("maven-docker-push-extension is active");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().contains("user/demo");
@@ -61,7 +62,7 @@ public class DockerPushIT {
                 .warn()
                 .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().contains("user/demo2");
@@ -86,7 +87,7 @@ public class DockerPushIT {
                 .warn()
                 .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().contains("user/demo2");
@@ -110,7 +111,7 @@ public class DockerPushIT {
                 .warn()
                 .doesNotContain("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
@@ -132,7 +133,7 @@ public class DockerPushIT {
                 .warn()
                 .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
@@ -156,7 +157,7 @@ public class DockerPushIT {
                 .warn()
                 .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-        Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+        Object repositories = Unirest.get(REGISTRY_URL)
                 .asJson()
                 .mapBody(node -> node.getObject().get("repositories"));
         Assertions.assertThat(repositories).asString().doesNotContain("user/demo2");
@@ -180,7 +181,7 @@ public class DockerPushIT {
                 .warn()
                 .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
 
-            Object repositories = Unirest.get("http://localhost:6000/v2/_catalog")
+            Object repositories = Unirest.get(REGISTRY_URL)
                     .asJson()
                     .mapBody(node -> node.getObject().get("repositories"));
             Assertions.assertThat(repositories).asString().contains("user/demo1",  "user/demo2");
