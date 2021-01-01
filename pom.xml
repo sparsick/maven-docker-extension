@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>3.11.05</version>
+            <version>3.11.09</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
