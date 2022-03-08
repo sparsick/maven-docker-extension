@@ -145,7 +145,9 @@ public class DockerPushExtension extends AbstractEventSpy {
 
         // this is necessary because cast throw an exception "incompatible type"
         Xpp3Dom dom = Xpp3DomBuilder.build(new StringReader(configuration.toString()));
-        dockerImageNames.addAll(Arrays.stream(dom.getChild("images").getChildren("image")).map(image -> image.getChild("name").getValue()).collect(Collectors.toSet()));
+        dockerImageNames.addAll(Arrays.stream(dom.getChild("images").getChildren("image"))
+                .map(image -> image.getChild("name").getValue())
+                .collect(Collectors.toSet()));
         LOGGER.info("Found docker image names: {}", dockerImageNames);
     }
 

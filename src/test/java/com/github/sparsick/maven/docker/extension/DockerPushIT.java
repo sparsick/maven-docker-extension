@@ -97,6 +97,31 @@ public class DockerPushIT {
     @MavenGoal("deploy")
     @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
     @SystemProperty(value = "maven.deploy.skip")
+    void configuration_using_properties(MavenExecutionResult result) {
+        assertThat(result).isSuccessful();
+
+        assertThat(result)
+                .out()
+                .info()
+                .contains("maven-docker-push-extension is active",
+                        "Found io.fabric8:docker-maven-plugin:push",
+                        "Starting pushing docker images...")
+                .doesNotContain("docker-maven-plugin:0.33.0:push (default) @ docker-push-no-extension");
+        assertThat(result)
+                .out()
+                .warn()
+                .contains("io.fabric8:docker-maven-plugin:push has been deactivated.");
+
+        Object repositories = Unirest.get(REGISTRY_URL)
+                .asJson()
+                .mapBody(node -> node.getObject().get("repositories"));
+        Assertions.assertThat(repositories).asString().contains("user/demo2");
+    }
+
+    @MavenTest
+    @MavenGoal("deploy")
+    @SystemProperty(value = "docker.push.registry", content = "localhost:6000")     //TODO fix port is bad
+    @SystemProperty(value = "maven.deploy.skip")
     void extension_is_set_but_no_docker_plugin(MavenExecutionResult result) {
         assertThat(result).isSuccessful();
 
