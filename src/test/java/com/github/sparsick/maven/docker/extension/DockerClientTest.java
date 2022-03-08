@@ -1,8 +1,10 @@
 package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 import kong.unirest.Unirest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +15,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Collections;
 
 @Testcontainers
@@ -28,7 +31,14 @@ class DockerClientTest {
     void setup() throws InterruptedException {
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .build();
-        dockerClient = DockerClientBuilder.getInstance(config).build();
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .maxConnections(100)
+                .connectionTimeout(Duration.ofSeconds(30))
+                .responseTimeout(Duration.ofSeconds(45))
+                .build();
+        dockerClient = DockerClientImpl.getInstance(config, httpClient);
 
         dockerClient
                 .buildImageCmd(new File("src/test/resources/Dockerfile"))
