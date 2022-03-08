@@ -52,8 +52,11 @@
         </dependency>
         <dependency>
             <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>3.2.13</version>
+            <artifactId>docker-java-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -103,6 +106,13 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>1.15.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.docker-java</groupId>
+                <artifactId>docker-java-bom</artifactId>
+                <version>3.2.13</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

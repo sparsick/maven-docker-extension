@@ -2,11 +2,14 @@ package com.github.sparsick.maven.docker.extension;
 
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
 
 
 public class DockerClient implements Closeable {
@@ -17,11 +20,16 @@ public class DockerClient implements Closeable {
 
     public DockerClient(String registryAddress) {
         this.registryAddress = registryAddress;
-        //Hier können wir ein wenig weiter machen.
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .build();
-        // when using docker-java directly
-        dockerClient = DockerClientBuilder.getInstance(config).build();
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .maxConnections(100)
+                .connectionTimeout(Duration.ofSeconds(30))
+                .responseTimeout(Duration.ofSeconds(45))
+                .build();
+        dockerClient = DockerClientImpl.getInstance(config, httpClient);
     }
 
     public void pushDockerImage(String imageName) {
