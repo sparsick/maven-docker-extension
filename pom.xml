@@ -23,7 +23,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <maven.version>3.8.6</maven.version>
-        <itf.version>0.11.0</itf.version>
+        <itf.version>0.13.1</itf.version>
     </properties>
 
     <dependencies>
